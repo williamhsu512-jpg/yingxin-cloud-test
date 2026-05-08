@@ -12,17 +12,14 @@
     .sub { color: #94a3b8; font-size: 0.85rem; margin-bottom: 25px; }
     .pwd-wrap { position: relative; margin-bottom: 20px; }
     input { width: 100%; padding: 14px; background: #000; color: #fff; border: 1px solid #1e2d45; border-radius: 10px; box-sizing: border-box; font-size: 1.1rem; outline: none; }
-    input:focus { border-color: var(--accent); }
     .eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.3rem; opacity: 0.7; }
-    button { width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; color: #000; }
-    button:active { transform: scale(0.97); opacity: 0.9; }
+    button { width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; color: #000; }
     #msg { color: #ff4d4d; font-size: 0.85rem; margin-top: 15px; min-height: 1.2em; }
     #mainApp { display: none; }
   </style>
 </head>
 <body>
 
-  <!-- 登入頁面 -->
   <div id="loginPage" class="card">
     <h1>YING XIN</h1>
     <div class="sub">盈鑫發電機管理系統</div>
@@ -34,10 +31,9 @@
     <div id="msg"></div>
   </div>
 
-  <!-- 登入成功後的顯示畫面 -->
   <div id="mainApp" class="card">
     <h2 style="color:var(--accent)">連線成功</h2>
-    <p style="margin: 20px 0;">已進入管理系統主畫面</p>
+    <p>系統已進入管理主畫面</p>
     <button onclick="localStorage.clear(); location.reload();" style="background:#444; color:#fff;">登出系統</button>
   </div>
 
@@ -75,10 +71,10 @@
           localStorage.setItem('isLoggedIn', 'true');
           showMain();
         } else {
-          msg.textContent = "❌ 密碼錯誤，請重新輸入";
+          msg.textContent = "❌ 密碼錯誤";
         }
       } catch (e) {
-        msg.textContent = "❌ 伺服器無回應，請確認 GAS 權限設為「所有人」";
+        msg.textContent = "❌ 連線失敗，請檢查 GAS 權限";
       } finally {
         loginBtn.disabled = false;
         loginBtn.textContent = "安全登入";
