@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>盈鑫發電機管理系統 - 雲端版</title>
+<title>盈鑫發電機管理系統 - 雲端壓縮版</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
   :root {
     --bg: #0a0e1a; --bg2: #111827; --card: #161d2e; --border: #1e2d45;
-    --accent: #f59e0b; --accent3: #10b981; --danger: #ef4444; --warn: #f97316;
-    --text: #e2e8f0; --text2: #94a3b8;
+    --accent: #f59e0b; --accent3: #10b981; --text: #e2e8f0; --text2: #94a3b8;
   }
   body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); margin:0; padding:0; }
   .nav { display: flex; background: var(--bg2); position: sticky; top:0; z-index:100; border-bottom: 1px solid var(--border); }
@@ -17,12 +16,12 @@
   .nav-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
   .container { padding: 15px; padding-bottom: 80px; max-width: 600px; margin: auto; }
   .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); }
-  h2, h3 { font-family: 'Rajdhani', sans-serif; margin-top:0; color: var(--accent); letter-spacing: 1px; }
+  h2, h3 { font-family: 'Rajdhani', sans-serif; margin-top:0; color: var(--accent); }
   input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #0a0e1a; color: white; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
   button.primary { background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; font-size: 1.1rem; cursor: pointer; margin-top: 10px; }
   .report-item { border-bottom: 1px solid var(--border); padding: 15px 0; }
-  .report-img { width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid #333; cursor: pointer; }
-  .status-tag { font-size: 0.8rem; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.1); margin-bottom: 5px; display: inline-block; }
+  .report-img { width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid #333; }
+  #syncMsg { font-size: 0.85rem; text-align: center; margin-top: 5px; color: var(--accent3); }
 </style>
 </head>
 <body>
@@ -31,15 +30,15 @@
   <div class="nav-btn active" onclick="showTab('home')">首頁</div>
   <div class="nav-btn" onclick="showTab('record')">記錄</div>
   <div class="nav-btn" onclick="showTab('report')">報表</div>
-  <div class="nav-btn" onclick="showTab('settings')">設定</div>
+  <div class="nav-btn" onclick="showTab('settings')">系統</div>
 </div>
 
 <div id="home" class="container tab-content">
   <div class="card">
     <h2>DASHBOARD</h2>
-    <p style="color:var(--text2)">歡迎使用盈鑫發電機雲端管理系統。請從下方切換功能。</p>
-    <div style="padding: 20px; text-align: center; border: 1px dashed var(--border); border-radius: 10px;">
-      <span style="font-size: 0.9rem; color: var(--accent3)">● 系統已連線至 Google 試算表</span>
+    <p style="color:var(--text2)">盈鑫發電機雲端管理版 (內建壓縮功能)</p>
+    <div style="padding: 15px; text-align: center; border: 1px dashed var(--accent3); border-radius: 10px; color: var(--accent3)">
+      ● 狀態：雲端資料庫已連線
     </div>
   </div>
 </div>
@@ -49,30 +48,31 @@
     <h2>ADD RECORD</h2>
     <label>發電機編號</label>
     <select id="genId"></select>
-    <label>累積時數 (hr)</label>
-    <input type="number" id="hours" placeholder="請輸入當下儀表讀數">
+    <label>目前時數 (hr)</label>
+    <input type="number" id="hours" placeholder="請輸入儀表讀數">
     <label>GPS 位置</label>
     <input type="text" id="location" placeholder="自動抓取中..." readonly>
-    <label>現場拍照</label>
+    <label>拍照 (自動壓縮)</label>
     <input type="file" id="photo" accept="image/*" capture="camera">
     <label>備註</label>
-    <textarea id="note" placeholder="例如：更換機油、檢查電池等"></textarea>
-    <button class="primary" id="saveBtn" onclick="handleSave()">儲存並同步到雲端</button>
+    <textarea id="note" placeholder="記錄保養內容..."></textarea>
+    <button class="primary" id="saveBtn" onclick="handleSave()">儲存並同步雲端</button>
+    <div id="syncMsg"></div>
   </div>
 </div>
 
 <div id="report" class="container tab-content" style="display:none;">
   <div class="card">
-    <h2>HISTORY REPORT</h2>
-    <div id="cloudReport">正在從 Google 抓取最新記錄...</div>
+    <h2>CLOUD REPORT</h2>
+    <div id="cloudReport">載入中...</div>
   </div>
 </div>
 
 <div id="settings" class="container tab-content" style="display:none;">
   <div class="card">
-    <h2>SYSTEM</h2>
-    <p>版本：v2.1 (Cloud Sync)</p>
-    <button onclick="location.reload()" style="background:#334155; color:white; border:none; padding:10px; border-radius:5px; width:100%;">重新整理頁面</button>
+    <h2>SYSTEM INFO</h2>
+    <p>版本：v2.2 (Auto-Compress)</p>
+    <button onclick="location.reload()" style="background:#334155; color:white; border:none; padding:10px; border-radius:5px; width:100%;">強制重新整理</button>
   </div>
 </div>
 
@@ -80,7 +80,7 @@
   // ──【1. 設定你的 GAS 網址】──────────────────
   const API_URL = "在此貼上你的網址"; 
 
-  // ──【2. 發電機清單】───────────────────────
+  // ──【2. 完整發電機清單】───────────────────────
   const GEN_LIST = ["300-01","300-02","300-03","300-04","220-01","220-02","150-01","150-02","150-03","125-01","125-02","100-01","100-02","90-01","60-01","60-02","60-03","60-04","60-05","60-06","60-07","60-08","60-09","60-10","60-11","45-02","45-03","45-04","45-05","45-05(換殼)","45-06","45-07","45-08","45-09","45-10","45-11","45-12","45-13","45-14","30-01","25-01","25-02","25-04","25-05","25-06","25-07","25-08","25-09","15-01","13-01","13-02","7.5kva","70-01-C","汽油4001","汽油7801","汽油8200","500-01","400-01-B","400-02-B","350-01","300-01-B","300-02-B","汽油點焊機"];
 
   const sel = document.getElementById('genId');
@@ -88,7 +88,7 @@
     let o = document.createElement('option'); o.value = id; o.textContent = id; sel.appendChild(o);
   });
 
-  // ──【3. 分頁與導航】───────────────────────
+  // ──【3. 導航功能】──────────────────────────
   function showTab(t) {
     document.querySelectorAll('.tab-content').forEach(e => e.style.display = 'none');
     document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
@@ -97,76 +97,103 @@
     if(t === 'report') fetchReport();
   }
 
-  // ──【4. 儲存與上傳邏輯】────────────────────
+  // ──【4. 同步邏輯：含自動壓縮】────────────────
   async function handleSave() {
     const id = document.getElementById('genId').value;
     const hr = document.getElementById('hours').value;
-    if(!id || !hr) return alert("編號與時數是必填的！");
+    if(!id || !hr) return alert("請填寫時數");
 
     const btn = document.getElementById('saveBtn');
+    const msg = document.getElementById('syncMsg');
+    
     btn.disabled = true;
-    btn.textContent = "🚀 同步中，請勿關閉...";
+    btn.textContent = "⚡ 正在壓縮與上傳...";
+    msg.textContent = "正在處理照片中...";
 
     const file = document.getElementById('photo').files[0];
     let base64 = "";
-    if(file) base64 = await toBase64(file);
+    
+    if(file) {
+      // 自動壓縮至寬度 1280px, 品質 0.7
+      base64 = await compressImage(file, 1280, 0.7);
+    }
 
     const payload = {
       genId: id, hours: hr, location: document.getElementById('location').value,
-      note: document.getElementById('note').value, photo: base64, user: "管理員"
+      note: document.getElementById('note').value, photo: base64, user: "現場工程師"
     };
 
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
       if(res.ok) {
-        alert("✅ 上傳成功！資料已存入 Google 試算表");
+        msg.textContent = "✅ 同步成功！";
+        alert("資料已成功存入試算表！");
         document.getElementById('hours').value = "";
-        document.getElementById('note').value = "";
         document.getElementById('photo').value = "";
+        document.getElementById('note').value = "";
       }
     } catch(e) {
-      alert("❌ 同步失敗，請檢查網路連線");
+      alert("❌ 同步失敗，請檢查網路");
+      msg.textContent = "同步失敗，請稍後重試";
     } finally {
       btn.disabled = false;
-      btn.textContent = "儲存並同步到雲端";
+      btn.textContent = "儲存並同步雲端";
     }
   }
 
-  // ──【5. 讀取報表】────────────────────────
+  // ──【5. 照片壓縮核心函數】───────────────────
+  function compressImage(file, maxWidth, quality) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                resolve(compressedBase64);
+            };
+        };
+        reader.onerror = error => reject(error);
+    });
+  }
+
+  // ──【6. 讀取報表】────────────────────────────
   async function fetchReport() {
     const box = document.getElementById('cloudReport');
-    box.innerHTML = "載入中...";
+    box.innerHTML = "正在連線雲端...";
     try {
       const res = await fetch(API_URL);
       const data = await res.json();
       let html = "";
-      // data 格式: [時間, 編號, 時數, 位置, 照片, 備註, 人員]
       data.reverse().forEach(r => {
         html += `<div class="report-item">
-          <div class="status-tag">${new Date(r[0]).toLocaleString()}</div>
-          <div style="font-size:1.2rem; font-weight:bold; font-family:'Rajdhani'; color:var(--accent)">${r[1]}</div>
-          <div style="margin:5px 0;">累積時數: ${r[2]} hr</div>
-          <div style="font-size:0.9rem; color:var(--text2)">${r[5] || '無備註'}</div>
+          <small style="color:var(--accent3)">${new Date(r[0]).toLocaleString()}</small><br>
+          <strong style="color:var(--accent); font-family:Rajdhani;">${r[1]}</strong> | ${r[2]} hr<br>
+          <span style="font-size:0.9rem; color:var(--text2)">${r[5] || '無備註'}</span>
           ${r[4] ? `<img src="${r[4]}" class="report-img" onclick="window.open(this.src)">` : ''}
         </div>`;
       });
-      box.innerHTML = html || "尚無任何記錄";
+      box.innerHTML = html || "目前尚無雲端記錄";
     } catch(e) {
-      box.innerHTML = "讀取失敗，請稍後再試";
+      box.innerHTML = "無法從雲端讀取報表";
     }
-  }
-
-  // ──【工具】────────────────────────────
-  function toBase64(f) {
-    return new Promise((r, j) => {
-      const rd = new FileReader(); rd.readAsDataURL(f);
-      rd.onload = () => r(rd.result);
-    });
   }
 
   navigator.geolocation.getCurrentPosition(p => {
     document.getElementById('location').value = p.coords.latitude.toFixed(4) + "," + p.coords.longitude.toFixed(4);
-  }, () => { document.getElementById('location').value = "定位關閉"; });
+  }, () => { document.getElementById('location').value = "定位功能未開啟"; });
 
 </script>
 </body>
