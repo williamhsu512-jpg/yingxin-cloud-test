@@ -3,33 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>盈鑫發電機雲端管理系統</title>
+<title>盈鑫發電機雲端系統</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&family=Noto+Sans+TC:wght@400;700&display=swap');
-  :root {
-    --bg: #0a0e1a; --card: #161d2e; --border: #1e2d45;
-    --accent: #f59e0b; --text: #e2e8f0; --text2: #94a3b8;
-  }
+  :root { --bg: #0a0e1a; --card: #161d2e; --border: #1e2d45; --accent: #f59e0b; --text: #e2e8f0; --text2: #94a3b8; }
   body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); margin:0; padding:0; }
-  
-  /* 登入介面 */
   #loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); z-index: 2000; display: flex; align-items: center; justify-content: center; }
   .login-card { width: 85%; max-width: 350px; padding: 30px; background: var(--card); border-radius: 15px; border: 1px solid var(--border); text-align: center; }
-  
   .pwd-container { position: relative; margin: 15px 0; }
   .pwd-container input { width: 100%; padding: 12px; padding-right: 45px; background: #0a0e1a; color: white; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 1.1rem; }
   .toggle-pwd { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.2rem; }
-
-  /* 主介面 */
   .nav { display: none; background: #111827; border-bottom: 1px solid var(--border); position: sticky; top:0; z-index:100; }
   .nav-btn { flex:1; padding: 15px; text-align:center; color: #64748b; font-weight:bold; cursor:pointer; }
   .nav-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
   .container { display: none; padding: 15px; max-width: 600px; margin: auto; }
   .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); }
-  
   input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #0a0e1a; color: white; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; }
   button.primary { background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; font-size: 1.1rem; cursor: pointer; }
-  .report-img { width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid #333; }
 </style>
 </head>
 <body>
@@ -37,7 +27,6 @@
 <div id="loginOverlay">
   <div class="login-card">
     <h1 style="font-family:Rajdhani; color:var(--accent); margin:0;">YING XIN</h1>
-    <p style="color:var(--text2); font-size:0.9rem; margin-bottom:20px;">發電機管理系統授權</p>
     <div class="pwd-container">
       <input type="password" id="sysPwd" placeholder="請輸入授權密碼">
       <span class="toggle-pwd" onclick="togglePwd()">👁️</span>
@@ -49,21 +38,21 @@
 
 <div class="nav" id="mainNav">
   <div class="nav-btn active" onclick="showTab('home')">首頁</div>
-  <div class="nav-btn" onclick="showTab('record')">數據錄入</div>
-  <div class="nav-btn" onclick="showTab('report')">雲端報表</div>
+  <div class="nav-btn" onclick="showTab('record')">數據</div>
+  <div class="nav-btn" onclick="showTab('report')">報表</div>
 </div>
 
-<div id="home" class="container" style="display:none;"><div class="card"><h2>DASHBOARD</h2><p style="color:var(--text2)">系統連線正常，數據已加密傳輸。</p></div></div>
+<div id="home" class="container"><div class="card"><h2>DASHBOARD</h2><p style="color:var(--text2)">系統在線，歡迎使用。</p></div></div>
 
 <div id="record" class="container">
   <div class="card">
     <h2>ADD RECORD</h2>
     <select id="genId"></select>
     <input type="number" id="hours" placeholder="儀表時數 (hr)" inputmode="decimal">
-    <input type="text" id="location" placeholder="GPS 定位讀取中..." readonly>
+    <input type="text" id="location" placeholder="GPS 讀取中..." readonly>
     <input type="file" id="photo" accept="image/*" capture="camera">
-    <textarea id="note" placeholder="備註事項..."></textarea>
-    <button class="primary" id="saveBtn" onclick="handleSave()">儲存並同步雲端</button>
+    <textarea id="note" placeholder="備註..."></textarea>
+    <button class="primary" id="saveBtn" onclick="handleSave()">儲存並同步</button>
   </div>
 </div>
 
@@ -72,8 +61,8 @@
 </div>
 
 <script>
-  // 使用你提供的新網址
-  const API_URL = "https://script.google.com/macros/s/AKfycbwis1byTxSxGtihar9WFydJ4hyWGqhhdYrbnomiijXA1CXWOdAslH3DVHFLrkoAi9C9Mg/exec"; 
+  // 已更新為你提供的最新網址
+  const API_URL = "https://script.google.com/macros/s/AKfycbxKkbP77jU22O9EGNExXolE7UQcdUzXq0AJZOs-Z6vq7b9EYCDfwM4yfGNkMYcPvKPgVQ/exec"; 
 
   function togglePwd() {
     const p = document.getElementById('sysPwd');
@@ -90,98 +79,5 @@
     err.textContent = "";
 
     try {
-      // 針對 GAS 的 GET 驗證方式
       const res = await fetch(`${API_URL}?action=login&auth=${encodeURIComponent(pwd)}`);
       const result = await res.json();
-
-      if(result.status === "success") {
-        localStorage.setItem('isLoggedIn', 'true');
-        enterApp();
-      } else {
-        err.textContent = "❌ 密碼錯誤";
-      }
-    } catch(e) {
-      err.textContent = "❌ 伺服器無回應，請確認 GAS 部署是否為「所有人」";
-    } finally {
-      btn.disabled = false; btn.textContent = "安全登入";
-    }
-  }
-
-  function enterApp() {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('mainNav').style.display = 'flex';
-    document.getElementById('home').style.display = 'block';
-    showTab('home');
-  }
-
-  if(localStorage.getItem('isLoggedIn') === 'true') enterApp();
-
-  const GEN_LIST = ["300-01","300-02","300-03","300-04","220-01","220-02","150-01","150-02","150-03","125-01","125-02","100-01","100-02","90-01","60-01","60-02","60-03","60-04","60-05","60-06","60-07","60-08","60-09","60-10","60-11","45-02","45-03","45-04","45-05","45-05(換殼)","45-06","45-07","45-08","45-09","45-10","45-11","45-12","45-13","45-14","30-01","25-01","25-02","25-04","25-05","25-06","25-07","25-08","25-09","15-01","13-01","13-02","7.5kva","70-01-C","汽油4001","汽油7801","汽油8200","500-01","400-01-B","400-02-B","350-01","300-01-B","300-02-B","汽油點焊機"];
-  const sel = document.getElementById('genId');
-  GEN_LIST.forEach(id => { let o = document.createElement('option'); o.value = id; o.textContent = id; sel.appendChild(o); });
-
-  function showTab(t) {
-    document.querySelectorAll('.container').forEach(e => e.style.display = 'none');
-    document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
-    document.getElementById(t).style.display = 'block';
-    if(t === 'report') fetchReport();
-  }
-
-  async function handleSave() {
-    const id = document.getElementById('genId').value;
-    const hr = document.getElementById('hours').value;
-    if(!hr) return alert("請輸入時數");
-    const btn = document.getElementById('saveBtn');
-    btn.disabled = true; btn.textContent = "上傳中...";
-    const file = document.getElementById('photo').files[0];
-    let base64 = "";
-    if(file) base64 = await compressImage(file, 1024, 0.7);
-    const payload = { genId: id, hours: hr, location: document.getElementById('location').value, note: document.getElementById('note').value, photo: base64, user: "管理員" };
-    try {
-      await fetch(API_URL, { method: "POST", mode: 'no-cors', body: JSON.stringify(payload) });
-      alert("✅ 資料已同步！");
-      location.reload();
-    } catch(e) { alert("❌ 同步失敗"); }
-    btn.disabled = false;
-  }
-
-  function compressImage(file, maxWidth, quality) {
-    return new Promise((resolve) => {
-      const reader = new FileReader(); reader.readAsDataURL(file);
-      reader.onload = (e) => {
-        const img = new Image(); img.src = e.target.result;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let w = img.width, h = img.height;
-          if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        };
-      };
-    });
-  }
-
-  async function fetchReport() {
-    const box = document.getElementById('cloudReport'); box.innerHTML = "讀取雲端資料中...";
-    try {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      let html = "";
-      data.reverse().forEach(r => {
-        html += `<div style="border-bottom:1px solid #1e2d45; padding:12px 0;">
-          <strong style="color:var(--accent)">${r[1]}</strong> | ${r[2]} hr<br>
-          <small style="color:var(--text2)">${new Date(r[0]).toLocaleString()}</small>
-          ${r[4] ? `<img src="${r[4]}" class="report-img">` : ''}
-        </div>`;
-      });
-      box.innerHTML = html || "暫無資料";
-    } catch(e) { box.innerHTML = "讀取失敗"; }
-  }
-
-  navigator.geolocation.getCurrentPosition(p => {
-    document.getElementById('location').value = p.coords.latitude.toFixed(4) + ", " + p.coords.longitude.toFixed(4);
-  });
-</script>
-</body>
-</html>
