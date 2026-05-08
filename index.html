@@ -3,95 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>盈鑫雲端管理系統</title>
+  <title>盈鑫雲端系統</title>
   <style>
-    :root { --bg: #0a0e1a; --card: #161d2e; --accent: #f59e0b; --text: #e2e8f0; }
-    body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
-    .card { background: var(--card); padding: 30px; border-radius: 15px; width: 85%; max-width: 350px; text-align: center; border: 1px solid #1e2d45; }
-    .pwd-container { position: relative; margin: 20px 0; }
-    input { width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid #1e2d45; border-radius: 8px; box-sizing: border-box; font-size: 1.1rem; }
-    .eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.2rem; user-select: none; }
-    button { width: 100%; padding: 15px; background: var(--accent); border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
-    #errMsg { color: #ff4d4d; font-size: 0.85rem; margin-top: 15px; min-height: 1.2em; }
-    #mainApp { display: none; text-align: center; }
+    :root { --bg: #0a0e1a; --accent: #f59e0b; --text: #e2e8f0; }
+    body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+    .card { background: #161d2e; padding: 35px; border-radius: 15px; width: 85%; max-width: 340px; border: 1px solid #1e2d45; box-shadow: 0 15px 35px rgba(0,0,0,0.6); text-align: center; }
+    h1 { color: var(--accent); margin: 0 0 5px 0; font-size: 1.8rem; letter-spacing: 1px; }
+    .sub { color: #94a3b8; font-size: 0.85rem; margin-bottom: 25px; }
+    .pwd-wrap { position: relative; margin-bottom: 20px; }
+    input { width: 100%; padding: 14px; background: #000; color: #fff; border: 1px solid #1e2d45; border-radius: 10px; box-sizing: border-box; font-size: 1.1rem; outline: none; }
+    input:focus { border-color: var(--accent); }
+    .eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.3rem; opacity: 0.7; }
+    button { width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; color: #000; }
+    button:active { transform: scale(0.97); opacity: 0.9; }
+    #msg { color: #ff4d4d; font-size: 0.85rem; margin-top: 15px; min-height: 1.2em; }
+    #mainApp { display: none; }
   </style>
 </head>
 <body>
 
+  <!-- 登入頁面 -->
   <div id="loginPage" class="card">
-    <h1 style="color:var(--accent); margin:0;">YING XIN</h1>
-    <p style="color:#94a3b8; font-size:0.9rem;">發電機管理系統</p>
-    <div class="pwd-container">
+    <h1>YING XIN</h1>
+    <div class="sub">盈鑫發電機管理系統</div>
+    <div class="pwd-wrap">
       <input type="password" id="sysPwd" placeholder="請輸入授權密碼">
-      <span id="eyeIcon" class="eye">👁️</span>
+      <span id="eyeBtn" class="eye">👁️</span>
     </div>
     <button id="loginBtn">安全登入</button>
-    <div id="errMsg"></div>
+    <div id="msg"></div>
   </div>
 
+  <!-- 登入成功後的顯示畫面 -->
   <div id="mainApp" class="card">
-    <h2 style="color:var(--accent)">登入成功</h2>
-    <p>系統連線正常，數據已加密</p>
-    <button onclick="localStorage.removeItem('isLoggedIn'); location.reload();" style="background:#444; color:#fff;">登出系統</button>
+    <h2 style="color:var(--accent)">連線成功</h2>
+    <p style="margin: 20px 0;">已進入管理系統主畫面</p>
+    <button onclick="localStorage.clear(); location.reload();" style="background:#444; color:#fff;">登出系統</button>
   </div>
 
   <script>
-    // 1. 填入你最新的 GAS 網址
     const API_URL = "https://script.google.com/macros/s/AKfycbxKkbP77jU22O9EGNExXolE7UQcdUzXq0AJZOs-Z6vq7b9EYCDfwM4yfGNkMYcPvKPgVQ/exec";
 
-    // 2. 密碼顯示/隱藏切換 (改用監聽器，防止 Not Defined 錯誤)
     const pwdInput = document.getElementById('sysPwd');
-    const eyeIcon = document.getElementById('eyeIcon');
+    const eyeBtn = document.getElementById('eyeBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    const msg = document.getElementById('msg');
 
-    eyeIcon.addEventListener('click', () => {
+    eyeBtn.addEventListener('click', () => {
       if (pwdInput.type === "password") {
         pwdInput.type = "text";
-        eyeIcon.textContent = "🙈";
+        eyeBtn.textContent = "🙈";
       } else {
         pwdInput.type = "password";
-        eyeIcon.textContent = "👁️";
+        eyeBtn.textContent = "👁️";
       }
     });
 
-    // 3. 登入邏輯
-    const loginBtn = document.getElementById('loginBtn');
-    const errMsg = document.getElementById('errMsg');
-
     loginBtn.addEventListener('click', async () => {
       const pwd = pwdInput.value;
-      if (!pwd) return;
+      if (!pwd) { msg.textContent = "請輸入密碼"; return; }
 
       loginBtn.disabled = true;
       loginBtn.textContent = "驗證中...";
-      errMsg.textContent = "";
+      msg.textContent = "";
 
       try {
         const response = await fetch(`${API_URL}?action=login&auth=${encodeURIComponent(pwd)}`);
-        const result = await response.json();
+        const data = await response.json();
 
-        if (result.status === "success") {
+        if (data.status === "success") {
           localStorage.setItem('isLoggedIn', 'true');
-          checkStatus();
+          showMain();
         } else {
-          errMsg.textContent = "❌ 密碼錯誤，請重新輸入";
+          msg.textContent = "❌ 密碼錯誤，請重新輸入";
         }
       } catch (e) {
-        errMsg.textContent = "❌ 伺服器連線失敗，請檢查 GAS 部署是否正確";
+        msg.textContent = "❌ 伺服器無回應，請確認 GAS 權限設為「所有人」";
       } finally {
         loginBtn.disabled = false;
         loginBtn.textContent = "安全登入";
       }
     });
 
-    // 4. 檢查登入狀態
-    function checkStatus() {
-      if (localStorage.getItem('isLoggedIn') === 'true') {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-      }
+    function showMain() {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
     }
 
-    checkStatus();
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+      showMain();
+    }
   </script>
 </body>
 </html>
