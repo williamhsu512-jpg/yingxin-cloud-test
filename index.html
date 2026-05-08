@@ -3,104 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>盈鑫雲端系統</title>
+  <title>盈鑫雲端管理系統</title>
   <style>
-    /* 簡化樣式確保加載速度 */
-    :root { --bg: #0a0e1a; --accent: #f59e0b; --text: #e2e8f0; }
-    body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; text-align: center; }
-    .card { background: #161d2e; margin: 20px auto; padding: 30px; width: 85%; max-width: 350px; border-radius: 15px; }
-    input { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border-radius: 8px; border: 1px solid #1e2d45; background: #000; color: #fff; }
-    button { width: 100%; padding: 15px; background: var(--accent); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .pwd-wrap { position: relative; }
-    .eye { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.2rem; }
-    #mainContent { display: none; padding: 20px; }
-    .nav { display: flex; background: #111; position: sticky; top: 0; }
-    .nav div { flex: 1; padding: 15px; cursor: pointer; color: #666; }
-    .nav div.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+    :root { --bg: #0a0e1a; --card: #161d2e; --accent: #f59e0b; --text: #e2e8f0; }
+    body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
+    .card { background: var(--card); padding: 30px; border-radius: 15px; width: 85%; max-width: 350px; text-align: center; border: 1px solid #1e2d45; }
+    .pwd-container { position: relative; margin: 20px 0; }
+    input { width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid #1e2d45; border-radius: 8px; box-sizing: border-box; font-size: 1.1rem; }
+    .eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.2rem; user-select: none; }
+    button { width: 100%; padding: 15px; background: var(--accent); border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+    #errMsg { color: #ff4d4d; font-size: 0.85rem; margin-top: 15px; min-height: 1.2em; }
+    #mainApp { display: none; text-align: center; }
   </style>
 </head>
 <body>
 
-  <div id="loginPage" style="display: flex; height: 100vh; align-items: center; justify-content: center;">
-    <div class="card">
-      <h1 style="color:var(--accent)">YING XIN</h1>
-      <div class="pwd-wrap">
-        <input type="password" id="sysPwd" placeholder="請輸入密碼">
-        <span class="eye" id="eyeBtn">👁️</span>
-      </div>
-      <button id="loginBtn">安全登入</button>
-      <p id="errMsg" style="color:red; font-size: 0.8rem; margin-top: 10px;"></p>
+  <div id="loginPage" class="card">
+    <h1 style="color:var(--accent); margin:0;">YING XIN</h1>
+    <p style="color:#94a3b8; font-size:0.9rem;">發電機管理系統</p>
+    <div class="pwd-container">
+      <input type="password" id="sysPwd" placeholder="請輸入授權密碼">
+      <span id="eyeIcon" class="eye">👁️</span>
     </div>
+    <button id="loginBtn">安全登入</button>
+    <div id="errMsg"></div>
   </div>
 
-  <div id="mainContent">
-    <div class="nav">
-      <div onclick="alert('目前已在首頁')">首頁</div>
-      <div onclick="location.reload()">重新整理</div>
-    </div>
-    <div class="card">
-      <h2>登入成功</h2>
-      <p>系統正常運作中</p>
-      <button onclick="localStorage.removeItem('isLoggedIn'); location.reload();" style="background:#444; color:#fff;">登出系統</button>
-    </div>
+  <div id="mainApp" class="card">
+    <h2 style="color:var(--accent)">登入成功</h2>
+    <p>系統連線正常，數據已加密</p>
+    <button onclick="localStorage.removeItem('isLoggedIn'); location.reload();" style="background:#444; color:#fff;">登出系統</button>
   </div>
 
   <script>
-    // ─── 設定區 ───
+    // 1. 填入你最新的 GAS 網址
     const API_URL = "https://script.google.com/macros/s/AKfycbxKkbP77jU22O9EGNExXolE7UQcdUzXq0AJZOs-Z6vq7b9EYCDfwM4yfGNkMYcPvKPgVQ/exec";
 
-    // ─── 核心功能：直接綁定事件監聽，避免 "not defined" 錯誤 ───
-    
-    // A. 密碼切換功能
-    document.getElementById('eyeBtn').addEventListener('click', function() {
-      const p = document.getElementById('sysPwd');
-      if (p.type === "password") {
-        p.type = "text";
-        this.textContent = "🙈";
+    // 2. 密碼顯示/隱藏切換 (改用監聽器，防止 Not Defined 錯誤)
+    const pwdInput = document.getElementById('sysPwd');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    eyeIcon.addEventListener('click', () => {
+      if (pwdInput.type === "password") {
+        pwdInput.type = "text";
+        eyeIcon.textContent = "🙈";
       } else {
-        p.type = "password";
-        this.textContent = "👁️";
+        pwdInput.type = "password";
+        eyeIcon.textContent = "👁️";
       }
     });
 
-    // B. 登入連線功能
-    document.getElementById('loginBtn').addEventListener('click', async function() {
-      const pwd = document.getElementById('sysPwd').value;
-      const err = document.getElementById('errMsg');
-      const btn = this;
+    // 3. 登入邏輯
+    const loginBtn = document.getElementById('loginBtn');
+    const errMsg = document.getElementById('errMsg');
 
+    loginBtn.addEventListener('click', async () => {
+      const pwd = pwdInput.value;
       if (!pwd) return;
-      btn.disabled = true;
-      btn.textContent = "驗證中...";
-      err.textContent = "";
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = "驗證中...";
+      errMsg.textContent = "";
 
       try {
-        const res = await fetch(`${API_URL}?action=login&auth=${encodeURIComponent(pwd)}`);
-        const result = await res.json();
+        const response = await fetch(`${API_URL}?action=login&auth=${encodeURIComponent(pwd)}`);
+        const result = await response.json();
 
         if (result.status === "success") {
           localStorage.setItem('isLoggedIn', 'true');
-          showMain();
+          checkStatus();
         } else {
-          err.textContent = "❌ 密碼錯誤";
+          errMsg.textContent = "❌ 密碼錯誤，請重新輸入";
         }
       } catch (e) {
-        err.textContent = "❌ 連線失敗，請檢查 GAS 部署是否正確";
+        errMsg.textContent = "❌ 伺服器連線失敗，請檢查 GAS 部署是否正確";
       } finally {
-        btn.disabled = false;
-        btn.textContent = "安全登入";
+        loginBtn.disabled = false;
+        loginBtn.textContent = "安全登入";
       }
     });
 
-    function showMain() {
-      document.getElementById('loginPage').style.display = 'none';
-      document.getElementById('mainContent').style.display = 'block';
+    // 4. 檢查登入狀態
+    function checkStatus() {
+      if (localStorage.getItem('isLoggedIn') === 'true') {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+      }
     }
 
-    // 檢查登入狀態
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-      showMain();
-    }
+    checkStatus();
   </script>
 </body>
 </html>
