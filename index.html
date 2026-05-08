@@ -1,102 +1,8 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>盈鑫發電機雲端管理系統</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
-  :root {
-    --bg: #0a0e1a; --bg2: #111827; --card: #161d2e; --border: #1e2d45;
-    --accent: #f59e0b; --accent3: #10b981; --text: #e2e8f0; --text2: #94a3b8;
-  }
-  body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); margin:0; padding:0; overflow-x: hidden; }
-  
-  /* 登入遮罩 */
-  #loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); z-index: 2000; display: flex; align-items: center; justify-content: center; }
-  .login-card { width: 85%; max-width: 350px; padding: 30px; background: var(--card); border-radius: 15px; border: 1px solid var(--border); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-  
-  /* 導覽列 */
-  .nav { display: none; background: var(--bg2); position: sticky; top:0; z-index:100; border-bottom: 1px solid var(--border); display: none; }
-  .nav-btn { flex:1; padding: 15px 5px; text-align:center; color: #64748b; font-size: 0.85rem; cursor:pointer; font-weight:bold; transition: 0.3s; }
-  .nav-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: rgba(245, 158, 11, 0.05); }
-  
-  /* 容器 */
-  .container { display: none; padding: 15px; padding-bottom: 80px; max-width: 600px; margin: auto; }
-  .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); }
-  h2 { font-family: 'Rajdhani', sans-serif; margin-top:0; color: var(--accent); letter-spacing: 1px; }
-  
-  /* 表單元件 */
-  input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #0a0e1a; color: white; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-  input:focus { border-color: var(--accent); outline: none; }
-  button.primary { background: var(--accent); color: #000; border: none; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
-  button.primary:active { transform: scale(0.98); opacity: 0.9; }
-  button:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; }
-  
-  .report-img { width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid #333; cursor: pointer; }
-  .status-tag { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; }
-</style>
-</head>
-<body>
-
-<div id="loginOverlay">
-  <div class="login-card">
-    <h1 style="font-family:Rajdhani; color:var(--accent); margin-bottom:10px;">YING XIN</h1>
-    <p style="color:var(--text2); font-size:0.9rem; margin-bottom:20px;">盈鑫發電機管理系統</p>
-    <input type="password" id="sysPwd" placeholder="請輸入系統授權密碼" autofocus>
-    <button class="primary" id="loginBtn" onclick="doLogin()">安全登入</button>
-    <p id="loginError" style="color:#ef4444; font-size:0.8rem; margin-top:15px; height: 1em;"></p>
-  </div>
-</div>
-
-<div class="nav" id="mainNav">
-  <div class="nav-btn active" onclick="showTab('home')">首頁</div>
-  <div class="nav-btn" onclick="showTab('record')">數據錄入</div>
-  <div class="nav-btn" onclick="showTab('report')">雲端報表</div>
-  <div class="nav-btn" onclick="showTab('settings')">系統</div>
-</div>
-
-<div id="home" class="container" style="display:none;">
-  <div class="card">
-    <h2>DASHBOARD</h2>
-    <div class="status-tag" style="background: rgba(16, 185, 129, 0.2); color: var(--accent3);">● 系統在線</div>
-    <p style="color:var(--text2); line-height: 1.6;">歡迎使用盈鑫發電機雲端管理系統。所有傳輸數據皆經由 SSL 加密處理。</p>
-  </div>
-</div>
-
-<div id="record" class="container">
-  <div class="card">
-    <h2>ADD RECORD</h2>
-    <label style="font-size:0.8rem; color:var(--text2)">選擇發電機編號</label>
-    <select id="genId"></select>
-    <input type="number" id="hours" placeholder="請輸入儀表讀數 (hr)" inputmode="decimal">
-    <input type="text" id="location" placeholder="GPS 定位抓取中..." readonly>
-    <input type="file" id="photo" accept="image/*" capture="camera">
-    <textarea id="note" rows="3" placeholder="異常記錄或保養事項備註..."></textarea>
-    <button class="primary" id="saveBtn" onclick="handleSave()">儲存並同步至 Google 雲端</button>
-  </div>
-</div>
-
-<div id="report" class="container">
-  <div class="card">
-    <h2>RECENT RECORDS</h2>
-    <div id="cloudReport">正在從 Google 試算表抓取最新 20 筆資料...</div>
-  </div>
-</div>
-
-<div id="settings" class="container">
-  <div class="card">
-    <h2>SYSTEM</h2>
-    <p style="color:var(--text2); font-size:0.9rem;">目前登入身分：系統管理員</p>
-    <button onclick="logout()" style="background:#ef4444; color:white; border:none; padding:15px; border-radius:8px; width:100%; font-weight:bold;">登出系統</button>
-  </div>
-</div>
-
 <script>
   // ──【核心設定】──
   const API_URL = "https://script.google.com/macros/s/AKfycbzpz9h6KONuRL2K4FT0c_kuNppiqZ57mctyEnCa7RxsYGr65-csmOHL-uL126mvXf9X3g/exec"; 
 
-  // 登入邏輯
+  // 登入邏輯：修正 Fetch 模式以避免無反應
   async function doLogin() {
     const pwd = document.getElementById('sysPwd').value;
     const btn = document.getElementById('loginBtn');
@@ -107,17 +13,10 @@
     err.textContent = "";
 
     try {
-      const res = await fetch(API_URL, { 
-        method: "POST", 
-        mode: 'no-cors', // 針對 GAS 的特殊處理
-        body: JSON.stringify({ action: "login", password: pwd }) 
-      });
-      
-      // 注意：由於 no-cors 無法讀取內容，這裡我們改用一般的 fetch 來獲取 JSON
-      // 但為了簡化，如果後端驗證失敗，通常會報 401 或回傳 fail。
-      // 以下是正式的驗證請求：
-      const checkRes = await fetch(API_URL + "?auth=" + encodeURIComponent(pwd));
-      const result = await checkRes.json();
+      // 改用 JSONP 概念或簡單 GET 請求來繞過 CORS 驗證
+      const checkUrl = `${API_URL}?action=login&auth=${encodeURIComponent(pwd)}`;
+      const res = await fetch(checkUrl);
+      const result = await res.json();
 
       if(result.status === "success") {
         localStorage.setItem('isLoggedIn', 'true');
@@ -127,7 +26,8 @@
         err.textContent = "❌ 授權密碼錯誤";
       }
     } catch(e) {
-      err.textContent = "❌ 無法連線至伺服器";
+      console.error(e);
+      err.textContent = "❌ 伺服器連線失敗，請檢查 GAS 是否部署為「所有人」";
     } finally {
       btn.disabled = false; btn.textContent = "安全登入";
     }
@@ -148,7 +48,7 @@
 
   if(localStorage.getItem('isLoggedIn') === 'true') enterApp();
 
-  // 發電機清單
+  // --- 發電機清單與其餘功能保持不變 ---
   const GEN_LIST = ["300-01","300-02","300-03","300-04","220-01","220-02","150-01","150-02","150-03","125-01","125-02","100-01","100-02","90-01","60-01","60-02","60-03","60-04","60-05","60-06","60-07","60-08","60-09","60-10","60-11","45-02","45-03","45-04","45-05","45-05(換殼)","45-06","45-07","45-08","45-09","45-10","45-11","45-12","45-13","45-14","30-01","25-01","25-02","25-04","25-05","25-06","25-07","25-08","25-09","15-01","13-01","13-02","7.5kva","70-01-C","汽油4001","汽油7801","汽油8200","500-01","400-01-B","400-02-B","350-01","300-01-B","300-02-B","汽油點焊機"];
   const sel = document.getElementById('genId');
   GEN_LIST.forEach(id => {
@@ -159,44 +59,61 @@
     document.querySelectorAll('.container').forEach(e => e.style.display = 'none');
     document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
     document.getElementById(t).style.display = 'block';
-    const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.textContent.includes(t==='home'?'首頁':t==='record'?'數據':t==='report'?'報表':'系統'));
-    if(activeBtn) activeBtn.classList.add('active');
     if(t === 'report') fetchReport();
   }
 
-  // 儲存與壓縮
   async function handleSave() {
     const id = document.getElementById('genId').value;
     const hr = document.getElementById('hours').value;
     if(!hr) return alert("請輸入儀表時數");
-
     const btn = document.getElementById('saveBtn');
-    btn.disabled = true; btn.textContent = "⚡ 正在壓縮並上傳...";
-
+    btn.disabled = true; btn.textContent = "⚡ 同步中...";
     const file = document.getElementById('photo').files[0];
     let base64 = "";
-    if(file) {
-      base64 = await compressImage(file, 1280, 0.7);
-    }
-
-    const payload = {
-      genId: id,
-      hours: hr,
-      location: document.getElementById('location').value,
-      note: document.getElementById('note').value,
-      photo: base64,
-      user: "管理員"
-    };
-
+    if(file) base64 = await compressImage(file, 1024, 0.7);
+    const payload = { genId: id, hours: hr, location: document.getElementById('location').value, note: document.getElementById('note').value, photo: base64, user: "管理員" };
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        mode: 'no-cors',
-        body: JSON.stringify(payload)
+      await fetch(API_URL, { method: "POST", mode: 'no-cors', body: JSON.stringify(payload) });
+      alert("✅ 資料已同步！");
+      location.reload();
+    } catch(e) { alert("❌ 同步失敗"); }
+    btn.disabled = false;
+  }
+
+  function compressImage(file, maxWidth, quality) {
+    return new Promise((resolve) => {
+      const reader = new FileReader(); reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        const img = new Image(); img.src = e.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let w = img.width, h = img.height;
+          if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+      };
+    });
+  }
+
+  async function fetchReport() {
+    const box = document.getElementById('cloudReport');
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      let html = "";
+      data.reverse().forEach(r => {
+        html += `<div style="border-bottom: 1px solid #1e2d45; padding: 10px 0;">
+          <strong style="color:var(--accent)">${r[1]}</strong> | ${r[2]} hr<br>
+          <small>${new Date(r[0]).toLocaleString()}</small>
+        </div>`;
       });
-      alert("✅ 資料已成功同步至 Google 試算表！");
-      document.getElementById('hours').value = "";
-      document.getElementById('photo').value = "";
-      document.getElementById('note').value = "";
-      showTab('report');
-    } catch(
+      box.innerHTML = html || "暫無資料";
+    } catch(e) { box.innerHTML = "讀取失敗"; }
+  }
+
+  navigator.geolocation.getCurrentPosition(p => {
+    document.getElementById('location').value = p.coords.latitude.toFixed(4) + ", " + p.coords.longitude.toFixed(4);
+  });
+</script>
