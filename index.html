@@ -5,107 +5,418 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>盈鑫雲端系統</title>
   <style>
-    :root { --bg: #0a0e1a; --accent: #f59e0b; --text: #e2e8f0; }
-    body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-    .card { background: #161d2e; padding: 35px; border-radius: 15px; width: 85%; max-width: 340px; border: 1px solid #1e2d45; box-shadow: 0 15px 35px rgba(0,0,0,0.6); text-align: center; }
-    h1 { color: var(--accent); margin: 0 0 5px 0; font-size: 1.8rem; letter-spacing: 1px; }
-    .sub { color: #94a3b8; font-size: 0.85rem; margin-bottom: 25px; }
-    .pwd-wrap { position: relative; margin-bottom: 20px; }
-    input { width: 100%; padding: 14px; background: #000; color: #fff; border: 1px solid #1e2d45; border-radius: 10px; box-sizing: border-box; font-size: 1.1rem; outline: none; -webkit-appearance: none; }
-    .eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.3rem; z-index: 10; }
-    button { width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; color: #000; -webkit-appearance: none; }
-    #msg { color: #ff4d4d; font-size: 0.85rem; margin-top: 15px; min-height: 1.2em; line-height: 1.4; }
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+TC:wght@300;400;500&display=swap');
+
+    :root {
+      --bg: #060910;
+      --card: #0d1321;
+      --accent: #f59e0b;
+      --accent2: #fbbf24;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --border: #1a2540;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 背景動態光效 */
+    body::before {
+      content: '';
+      position: fixed;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%);
+      top: -200px; left: -200px;
+      animation: drift1 12s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(16,185,129,0.04) 0%, transparent 70%);
+      bottom: -100px; right: -100px;
+      animation: drift2 15s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes drift1 { from { transform: translate(0,0); } to { transform: translate(80px, 60px); } }
+    @keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-60px, -40px); } }
+
+    /* 掃描線效果 */
+    .scanlines {
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+      pointer-events: none; z-index: 0;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 40px 36px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 360px;
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      animation: cardIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* 卡片頂部裝飾線 */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 15%; right: 15%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      border-radius: 2px;
+    }
+
+    .logo-wrap {
+      margin-bottom: 24px;
+    }
+
+    .logo-icon {
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05));
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 1.6rem;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.2); }
+      50%      { box-shadow: 0 0 0 8px rgba(245,158,11,0); }
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--accent);
+      font-size: 1.7rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      line-height: 1;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 22px 0;
+    }
+
+    .field-label {
+      text-align: left;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .pwd-wrap {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    input[type="password"], input[type="text"] {
+      width: 100%;
+      padding: 14px 46px 14px 16px;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: 'Noto Sans TC', sans-serif;
+      outline: none;
+      -webkit-appearance: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: rgba(245,158,11,0.5);
+      box-shadow: 0 0 0 3px rgba(245,158,11,0.08);
+    }
+
+    .eye {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 1.1rem;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+      user-select: none;
+    }
+    .eye:hover { opacity: 1; }
+
+    .login-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      font-family: 'Noto Sans TC', sans-serif;
+      cursor: pointer;
+      color: #000;
+      letter-spacing: 1px;
+      transition: opacity 0.2s, transform 0.1s;
+      -webkit-appearance: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-btn:active { transform: scale(0.98); }
+    .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* 按鈕 shimmer */
+    .login-btn::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: shimmer 2.5s ease-in-out infinite;
+    }
+    @keyframes shimmer { to { left: 150%; } }
+
+    #msg {
+      font-size: 0.82rem;
+      margin-top: 14px;
+      min-height: 1.2em;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      margin-right: 6px;
+      animation: blink 2s ease-in-out infinite;
+      vertical-align: middle;
+    }
+    @keyframes blink { 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
+
+    .footer-note {
+      margin-top: 20px;
+      font-size: 0.72rem;
+      color: #2a3a55;
+    }
+
+    /* ── 主畫面 ── */
     #mainApp { display: none; }
+
+    .main-card {
+      background: var(--card);
+      padding: 36px;
+      border-radius: 20px;
+      width: 90%; max-width: 360px;
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
+      text-align: center;
+      position: relative; z-index: 1;
+      animation: cardIn 0.5s ease both;
+    }
+
+    .main-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 15%; right: 15%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--success), transparent);
+      border-radius: 2px;
+    }
+
+    .success-icon {
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05));
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 18px;
+      font-size: 1.8rem;
+    }
+
+    .main-card h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--success);
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .main-card p {
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    .logout-btn {
+      margin-top: 24px;
+      width: 100%;
+      padding: 13px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-family: 'Noto Sans TC', sans-serif;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      -webkit-appearance: none;
+    }
+    .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
   </style>
 </head>
 <body>
+  <div class="scanlines"></div>
 
+  <!-- ── 登入頁 ── -->
   <div id="loginPage" class="card">
-    <h1>YING XIN</h1>
-    <div class="sub">盈鑫發電機管理系統</div>
+    <div class="logo-wrap">
+      <div class="logo-icon">⚡</div>
+      <h1>YING XIN</h1>
+      <div class="sub">盈鑫發電機雲端管理系統</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="field-label">授權密碼</div>
     <div class="pwd-wrap">
-      <input type="password" id="sysPwd" placeholder="請輸入授權密碼" autocomplete="off">
+      <input type="password" id="sysPwd" placeholder="請輸入系統授權密碼" autocomplete="off">
       <span id="eyeBtn" class="eye">👁️</span>
     </div>
-    <button id="loginBtn">安全登入</button>
+
+    <button class="login-btn" id="loginBtn">安全登入</button>
+
     <div id="msg"></div>
+
+    <div class="footer-note">
+      <span class="status-dot"></span>系統伺服器運作中
+    </div>
   </div>
 
-  <div id="mainApp" class="card">
-    <h2 style="color:var(--accent)">連線成功</h2>
-    <p>系統已進入管理主畫面</p>
-    <button id="logoutBtn" style="background:#444; color:#fff; margin-top:20px;">登出系統</button>
+  <!-- ── 主畫面 ── -->
+  <div id="mainApp" class="main-card">
+    <div class="success-icon">✅</div>
+    <h2>ACCESS GRANTED</h2>
+    <p>系統驗證成功<br>已進入盈鑫管理主畫面</p>
+    <button class="logout-btn" id="logoutBtn">登出系統</button>
   </div>
 
   <script>
-    // 鎖定您提供的正確網址
-    const API_URL = "https://script.google.com/macros/s/AKfycbxKkbP77jU22O9EGNExXolE7UQcdUzXq0AJZOs-Z6vq7b9EYCDfwM4yfGNkMYcPvKPgVQ/exec";
-
+    // ── DOM 綁定 ──
     const pwdInput = document.getElementById('sysPwd');
-    const eyeBtn = document.getElementById('eyeBtn');
+    const eyeBtn   = document.getElementById('eyeBtn');
     const loginBtn = document.getElementById('loginBtn');
-    const msg = document.getElementById('msg');
+    const msg      = document.getElementById('msg');
 
-    // 密碼顯示切換
+    // ── 切換密碼顯示 ──
     eyeBtn.addEventListener('click', () => {
-      if (pwdInput.type === "password") {
-        pwdInput.type = "text";
-        eyeBtn.textContent = "🙈";
+      const show = pwdInput.type === 'password';
+      pwdInput.type = show ? 'text' : 'password';
+      eyeBtn.textContent = show ? '🙈' : '👁️';
+    });
+
+    // ── 按下 Enter 觸發登入 ──
+    pwdInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') loginBtn.click();
+    });
+
+    // ── 登入邏輯（使用 google.script.run，無 CORS 問題）──
+    loginBtn.addEventListener('click', () => {
+      const pwd = pwdInput.value.trim();
+      if (!pwd) {
+        showMsg('❗ 請先輸入授權密碼', 'warn');
+        return;
+      }
+
+      setLoading(true);
+      showMsg('🔐 驗證中，請稍候...', 'info');
+
+      // google.script.run 是 GAS Web App 專用橋接，不走跨網域
+      google.script.run
+        .withSuccessHandler(onLoginSuccess)
+        .withFailureHandler(onLoginError)
+        .loginUser(pwd);
+    });
+
+    function onLoginSuccess(result) {
+      setLoading(false);
+      if (result && result.status === 'success') {
+        showMsg('✅ 驗證成功，正在跳轉...', 'ok');
+        setTimeout(() => {
+          document.getElementById('loginPage').style.display = 'none';
+          document.getElementById('mainApp').style.display   = 'block';
+        }, 600);
       } else {
-        pwdInput.type = "password";
-        eyeBtn.textContent = "👁️";
+        showMsg('❌ 密碼錯誤，請重新輸入', 'err');
+        pwdInput.value = '';
+        pwdInput.focus();
       }
-    });
+    }
 
-    // 登入邏輯
-    loginBtn.addEventListener('click', async () => {
-      const pwd = pwdInput.value;
-      if (!pwd) { msg.textContent = "請輸入密碼"; return; }
+    function onLoginError(err) {
+      setLoading(false);
+      console.error('GAS Error:', err);
+      showMsg('❌ 伺服器錯誤，請聯絡管理員\n' + (err.message || ''), 'err');
+    }
 
-      loginBtn.disabled = true;
-      loginBtn.textContent = "連線中...";
-      msg.style.color = "#94a3b8";
-      msg.textContent = "正在穿透防火牆...";
-
-      try {
-        // 使用 cache: 'no-cache' 強迫瀏覽器更新，不抓舊的錯誤紀錄
-        const targetUrl = `${API_URL}?action=login&auth=${encodeURIComponent(pwd)}`;
-        const response = await fetch(targetUrl, {
-          method: 'GET',
-          mode: 'cors',
-          cache: 'no-cache',
-          redirect: 'follow'
-        });
-
-        if (!response.ok) throw new Error("網路回應異常");
-
-        const data = await response.json();
-
-        if (data.status === "success") {
-          localStorage.setItem('isLoggedIn', 'true');
-          location.reload();
-        } else {
-          msg.style.color = "#ff4d4d";
-          msg.textContent = "❌ 密碼錯誤，請重新檢查";
-        }
-      } catch (e) {
-        console.error(e);
-        msg.style.color = "#ff4d4d";
-        msg.textContent = "❌ 連線遭攔截。請嘗試：\n1. 開啟「無痕分頁」測試\n2. 檢查 GAS 權限是否為「所有人」";
-      } finally {
-        loginBtn.disabled = false;
-        loginBtn.textContent = "安全登入";
-      }
-    });
-
+    // ── 登出 ──
     document.getElementById('logoutBtn')?.addEventListener('click', () => {
-      localStorage.clear();
-      location.reload();
+      document.getElementById('mainApp').style.display   = 'none';
+      document.getElementById('loginPage').style.display = 'block';
+      pwdInput.value = '';
+      showMsg('', '');
     });
 
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-      document.getElementById('loginPage').style.display = 'none';
-      document.getElementById('mainApp').style.display = 'block';
+    // ── 工具函式 ──
+    function setLoading(on) {
+      loginBtn.disabled    = on;
+      loginBtn.textContent = on ? '驗證中...' : '安全登入';
+    }
+
+    function showMsg(text, type) {
+      msg.textContent = text;
+      msg.style.color = {
+        err:  'var(--danger)',
+        ok:   'var(--success)',
+        info: '#94a3b8',
+        warn: 'var(--accent)',
+        '':   'transparent'
+      }[type] || '#94a3b8';
     }
   </script>
 </body>
